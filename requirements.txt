@@ -1,4 +1,5 @@
-chromadb
+﻿chromadb
+fastapi
 groq
 langchain
 langgraph
@@ -9,3 +10,4 @@ pyyaml
 python-dotenv
 requests
 sentence-transformers
+uvicorn

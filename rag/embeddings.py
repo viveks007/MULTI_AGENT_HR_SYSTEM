@@ -20,7 +20,11 @@ def _load_model():
 def get_embedding(text: str) -> List[float]:
     try:
         model = _load_model()
-        return model.encode(text).tolist()
+        embedding = model.encode(text)
+        # Handle both numpy arrays and lists
+        if hasattr(embedding, 'tolist'):
+            return embedding.tolist()
+        return list(embedding)
     except Exception:
         digest = hashlib.sha256(text.encode("utf-8")).digest()
         return [byte / 255.0 for byte in digest]

@@ -13,7 +13,7 @@ class Retriever:
         if not query:
             return []
 
-        query_embedding = get_embedding(query).tolist()
+        query_embedding = get_embedding(query)
         results = self.vector_store.similarity_search(
             query_embedding=query_embedding,
             top_k=top_k,

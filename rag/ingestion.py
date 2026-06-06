@@ -74,7 +74,7 @@ def ingest(data_dir: str = "data", persist_path: Optional[str] = None) -> Vector
     for document in documents:
         chunks = chunk_documents(document["text"])
         for chunk_index, chunk_text in enumerate(chunks):
-            embedding = get_embedding(chunk_text).tolist()
+            embedding = get_embedding(chunk_text)
             store.add_document(
                 chunk_text=chunk_text,
                 embedding=embedding,

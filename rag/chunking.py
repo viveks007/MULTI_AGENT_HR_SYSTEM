@@ -1,7 +1,7 @@
 ﻿from typing import List
 
 
-def chunk_documents(text: str, chunk_size: int = 500, chunk_overlap: int = 100) -> List[str]:
+def chunk_documents(text: str, chunk_size: int = 500, chunk_overlap: int = 0) -> List[str]:
     text = text.replace("\r\n", "\n").strip()
     if not text:
         return []
@@ -27,3 +27,6 @@ def chunk_documents(text: str, chunk_size: int = 500, chunk_overlap: int = 100) 
         start = max(end - chunk_overlap, 0)
 
     return chunks
+
+
+chunk_text = chunk_documents

@@ -22,4 +22,7 @@ class ResponseAgent:
             snippets.append(f"From {source}: {text[:300].strip()}")
 
         summary = "\n\n".join(snippets)
-        return f"{self.prompt}\n\n{summary}"
+        
+        # Generate a response based on retrieved content
+        response = f"Based on our HR documentation:\n\n{summary}\n\nFor more detailed information, please contact the HR department."
+        return response
