@@ -1,11 +1,9 @@
-"""Simple vector store placeholder."""
+import chromadb
 
-class VectorStore:
-    def __init__(self):
-        self._items = []
+client = chromadb.PersistentClient(
+    path="./chroma_db"
+)
 
-    def add(self, vector, meta=None):
-        self._items.append((vector, meta))
-
-    def search(self, vector, k=5):
-        return []
+collection = client.get_or_create_collection(
+    name="hr_documents"
+)
