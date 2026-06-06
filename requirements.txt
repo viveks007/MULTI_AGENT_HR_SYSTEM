@@ -1,0 +1,4 @@
+python-dotenv
+mlflow
+pytest
+requests
