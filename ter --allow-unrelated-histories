@@ -1,0 +1,4 @@
+* [33m4b69b88[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m agent, prompt, app updated
+* [33m6f676d3[m Agent & agent prompt
+* [33ma4bdc4d[m[33m ([m[1;31morigin/master[m[33m)[m Added ChromaDB vector store integration
+* [33m731d9ee[m Initial project setup with ingestion pipeline and HR documents
