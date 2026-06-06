@@ -1,10 +1,29 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+﻿from typing import List
 
-def chunk_documents(text):
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=100
-    )
+def chunk_documents(text: str, chunk_size: int = 500, chunk_overlap: int = 100) -> List[str]:
+    text = text.replace("\r\n", "\n").strip()
+    if not text:
+        return []
 
-    return splitter.split_text(text)
+    chunks: List[str] = []
+    start = 0
+    text_length = len(text)
+
+    while start < text_length:
+        end = min(start + chunk_size, text_length)
+        if end < text_length:
+            boundary = text.rfind(" ", start, end)
+            if boundary > start:
+                end = boundary
+
+        chunk = text[start:end].strip()
+        if chunk:
+            chunks.append(chunk)
+
+        if end >= text_length:
+            break
+
+        start = max(end - chunk_overlap, 0)
+
+    return chunks

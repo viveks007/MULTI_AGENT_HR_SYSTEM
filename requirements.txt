@@ -1,4 +1,11 @@
-python-dotenv
+chromadb
+groq
+langchain
+langgraph
 mlflow
 pytest
+PyPDF2
+pyyaml
+python-dotenv
 requests
+sentence-transformers
