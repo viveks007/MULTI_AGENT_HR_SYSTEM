@@ -1,7 +1,5 @@
 # MULTI_AGENT_HR_SYSTEM
 
-# MULTI_AGENT_HR_SYSTEM
-
 Multi-Agent HR Assistant powered by:
 
 - Groq (Llama 3.3 70B)

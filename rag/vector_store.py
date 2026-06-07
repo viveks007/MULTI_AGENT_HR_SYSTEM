@@ -21,6 +21,7 @@ class VectorStore:
 
     def __init__(self) -> None:
         self.documents: List[Document] = []
+        self.embedding_dim: int = 0
 
     def add_document(
         self,
@@ -28,6 +29,9 @@ class VectorStore:
         embedding: List[float],
         metadata: Optional[Dict[str, Any]] = None,
     ) -> None:
+        if self.embedding_dim == 0 and embedding is not None:
+            self.embedding_dim = len(embedding)
+
         self.documents.append(
             {
                 "chunk_text": chunk_text,
@@ -38,6 +42,10 @@ class VectorStore:
 
     def add_documents(self, documents: List[Document]) -> None:
         self.documents.extend(documents)
+        if documents and self.embedding_dim == 0:
+            first_embedding = documents[0].get("embedding")
+            if first_embedding is not None:
+                self.embedding_dim = len(first_embedding)
 
     def similarity_search(self, query_embedding: List[float], top_k: int = 3) -> Dict[str, Any]:
         scored = [
@@ -59,7 +67,7 @@ class VectorStore:
         path_obj = Path(path)
         path_obj.parent.mkdir(parents=True, exist_ok=True)
         with path_obj.open("wb") as handle:
-            pickle.dump(self.documents, handle)
+            pickle.dump({"documents": self.documents, "embedding_dim": self.embedding_dim}, handle)
 
     @classmethod
     def load(cls, path: str) -> "VectorStore":
@@ -69,6 +77,19 @@ class VectorStore:
             raise FileNotFoundError(f"Vector store file not found: {path}")
 
         with path_obj.open("rb") as handle:
-            store.documents = pickle.load(handle)
+            data = pickle.load(handle)
+            if isinstance(data, dict) and "documents" in data:
+                store.documents = data["documents"]
+                store.embedding_dim = data.get("embedding_dim", 0)
+            else:
+                store.documents = data
+                if store.documents:
+                    first_embedding = store.documents[0].get("embedding")
+                    store.embedding_dim = len(first_embedding) if first_embedding is not None else 0
 
         return store
+
+    def is_compatible(self, expected_dim: int) -> bool:
+        if self.embedding_dim == 0:
+            return True
+        return self.embedding_dim == expected_dim

@@ -13,7 +13,9 @@ from agents.intent_agent import IntentAgent
 from agents.policy_agent import PolicyAgent
 from agents.response_agent import ResponseAgent
 from agents.retrieval_agent import RetrievalAgent
+from rag.embeddings import get_embedding
 from rag.ingestion import ingest
+from rag.vector_store import VectorStore
 
 app = FastAPI(title="Multi-Agent HR System", version="1.0.0")
 
@@ -41,7 +43,22 @@ class QueryResponse(BaseModel):
 
 
 def ensure_vector_store():
-    """Ensure the vector store exists; ingest if missing."""
+    """Ensure the vector store exists; ingest if missing or incompatible."""
+    if Path(VECTOR_STORE_PATH).exists():
+        try:
+            store = VectorStore.load(VECTOR_STORE_PATH)
+            expected_dim = len(get_embedding("test"))
+            if not store.is_compatible(expected_dim):
+                print("Existing vector store embedding dimension is incompatible. Rebuilding...")
+                ingest(data_dir="data", persist_path=VECTOR_STORE_PATH)
+                print(f"Vector store rebuilt at {VECTOR_STORE_PATH}")
+                return
+        except Exception as e:
+            print(f"Unable to load existing vector store: {e}. Rebuilding...")
+            ingest(data_dir="data", persist_path=VECTOR_STORE_PATH)
+            print(f"Vector store rebuilt at {VECTOR_STORE_PATH}")
+            return
+
     if not Path(VECTOR_STORE_PATH).exists():
         print("Vector store not found. Running ingestion...")
         try:
@@ -130,7 +147,16 @@ async def query_hr_system(request: QueryRequest) -> QueryResponse:
         intent = intent_agent.predict_intent(query)
         retrieved_docs = retrieval_agent.retrieve(query, top_k=3)
         action = policy_agent.decide(intent, retrieved_docs)
-        answer = response_agent.generate(query, retrieved_docs)
+
+        if action["action"] == "greeting":
+            answer = "Hello! How can I help you with HR questions today?"
+        elif action["action"] == "ask_clarification":
+            answer = "I’m not sure what you mean. Can you please clarify your HR question?"
+        elif action["action"] == "escalate":
+            answer = "I could not find any relevant HR information. Please provide more details or ask a different question."
+        else:
+            answer = response_agent.generate(query, retrieved_docs)
+
         score = critic_agent.score(answer, query)
         
         return QueryResponse(

@@ -12,6 +12,9 @@ class PolicyAgent:
         if intent == "unknown":
             return {"action": "ask_clarification", "reason": "User intent is unclear."}
 
+        if intent == "greeting":
+            return {"action": "greeting", "reason": "Respond with a friendly greeting."}
+
         if not retrieved_documents:
             return {"action": "escalate", "reason": "No relevant knowledge base documents were found."}
 
